@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@romatech/orm-providers-mongodb - docs</title>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; max-width: 900px; margin: 0 auto; padding: 2rem; }
+        h1 { border-bottom: 1px solid #eee; padding-bottom: 0.5rem; }
+        pre { background: #f8f8f8; border: 1px solid #ccc; border-radius: 4px; padding: 1rem; overflow-x: auto; }
+        code { font-family: Menlo, Monaco, monospace; }
+        a { color: #4271ae; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <h1>@romatech/orm-providers-mongodb</h1>
+    <p>MongoDB (NoSQL) provider for <a href="https://www.npmjs.com/package/@romatech/orm">@romatech/orm</a>.</p>
+    <p>
+        <a href="https://github.com/RomaTech-LTDA/orm-providers-mongodb">GitHub</a> |
+        <a href="https://www.npmjs.com/package/@romatech/orm-providers-mongodb">npm</a>
+    </p>
+    <h2>Installation</h2>
+    <pre><code>npm install @romatech/orm @romatech/orm-providers-mongodb reflect-metadata</code></pre>
+    <h2>Quick Start</h2>
+    <pre><code>import { MongoDbProvider } from '@romatech/orm-providers-mongodb';
+
+new DbContextOptions().useProvider(
+    new MongoDbProvider({
+        uri: 'mongodb://localhost:27017',
+        database: 'myapp',
+    })
+)</code></pre>
+</body>
+</html>

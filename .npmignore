@@ -1,0 +1,13 @@
+src/
+.github/
+.gitignore
+.editorconfig
+.npmrc
+.nvmrc
+tsconfig.json
+publish.sh
+index.html
+logo.png
+CONTRIBUTING.md
+SECURITY.md
+CHANGELOG.md

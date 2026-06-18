@@ -1,0 +1,60 @@
+{
+  "name": "@romatech/orm-providers-mongodb",
+  "version": "1.1.0",
+  "description": "MongoDB provider for RomaTech ORM — NoSQL document database support",
+  "author": "RomaTech/Leandro Romanelli",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RomaTech-LTDA/orm-providers-mongodb"
+  },
+  "homepage": "https://github.com/RomaTech-LTDA/orm-providers-mongodb#readme",
+  "bugs": {
+    "url": "https://github.com/RomaTech-LTDA/orm-providers-mongodb/issues"
+  },
+  "keywords": [
+    "orm",
+    "mongodb",
+    "nosql",
+    "document",
+    "romatech",
+    "database",
+    "typescript"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "npm run clean && tsc",
+    "watch": "tsc --watch"
+  },
+  "dependencies": {
+    "mongodb": "^6.0.0"
+  },
+  "peerDependencies": {
+    "@romatech/orm": "^1.1.0"
+  },
+  "devDependencies": {
+    "@romatech/orm": "^1.1.0",
+    "@types/node": "^24.1.0",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
