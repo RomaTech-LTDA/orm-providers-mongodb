@@ -345,13 +345,77 @@ export class MongoDbProvider implements IDbProvider {
   }
 
   private buildMongoFilter(query: QueryObject<any, any>): Record<string, any> {
-    // For now, return empty filter (client-side evaluation)
-    // Full MongoDB query translation would parse QueryExpression into $match
-    if (!query.predicates || query.predicates.length === 0) {
+    if (!query.whereExpressions || query.whereExpressions.length === 0) {
       return {};
     }
-    // Fallback: return all and let client-side handle filtering
-    return {};
+
+    // Translate QueryExpression trees to MongoDB $match operators
+    const conditions: Record<string, any>[] = [];
+
+    for (const expr of query.whereExpressions) {
+      const condition = this.translateExpression(expr);
+      if (condition) conditions.push(condition);
+    }
+
+    if (conditions.length === 0) return {};
+    if (conditions.length === 1) return conditions[0];
+    return { $and: conditions };
+  }
+
+  private translateExpression(expr: any): Record<string, any> | null {
+    if (!expr) return null;
+
+    // Binary comparison: { type: 'comparison', field, operator, value }
+    if (expr.type === 'comparison' && expr.field && expr.operator) {
+      const field = expr.field === 'id' ? '_id' : expr.field;
+      switch (expr.operator) {
+        case '===': case '==': return { [field]: expr.value };
+        case '!==': case '!=': return { [field]: { $ne: expr.value } };
+        case '>': return { [field]: { $gt: expr.value } };
+        case '>=': return { [field]: { $gte: expr.value } };
+        case '<': return { [field]: { $lt: expr.value } };
+        case '<=': return { [field]: { $lte: expr.value } };
+      }
+    }
+
+    // Logical AND: { type: 'and', left, right }
+    if (expr.type === 'and') {
+      const left = this.translateExpression(expr.left);
+      const right = this.translateExpression(expr.right);
+      const parts = [left, right].filter(Boolean);
+      if (parts.length === 0) return null;
+      if (parts.length === 1) return parts[0]!;
+      return { $and: parts };
+    }
+
+    // Logical OR: { type: 'or', left, right }
+    if (expr.type === 'or') {
+      const left = this.translateExpression(expr.left);
+      const right = this.translateExpression(expr.right);
+      const parts = [left, right].filter(Boolean);
+      if (parts.length === 0) return null;
+      if (parts.length === 1) return parts[0]!;
+      return { $or: parts };
+    }
+
+    // String contains: { type: 'stringMethod', field, method: 'includes', value }
+    if (expr.type === 'stringMethod' && expr.field) {
+      const field = expr.field === 'id' ? '_id' : expr.field;
+      switch (expr.method) {
+        case 'includes': return { [field]: { $regex: expr.value, $options: 'i' } };
+        case 'startsWith': return { [field]: { $regex: `^${expr.value}`, $options: 'i' } };
+        case 'endsWith': return { [field]: { $regex: `${expr.value}$`, $options: 'i' } };
+      }
+    }
+
+    // Boolean member: { type: 'member', field, negated? }
+    if (expr.type === 'member' && expr.field) {
+      const field = expr.field === 'id' ? '_id' : expr.field;
+      return { [field]: expr.negated ? false : true };
+    }
+
+    // Unrecognized expression — fall back to client-side
+    return null;
   }
 
   private inferTsType(value: any): string {
