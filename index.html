@@ -1,34 +1,132 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>@romatech/orm-providers-mongodb - docs</title>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@romatech/orm-providers-mongodb — MongoDB Provider</title>
+    <meta name="description" content="MongoDB (NoSQL) provider for @romatech/orm. Full CRUD, transactions, QueryBuilder, pagination, and migration tracking.">
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; max-width: 900px; margin: 0 auto; padding: 2rem; }
-        h1 { border-bottom: 1px solid #eee; padding-bottom: 0.5rem; }
-        pre { background: #f8f8f8; border: 1px solid #ccc; border-radius: 4px; padding: 1rem; overflow-x: auto; }
-        code { font-family: Menlo, Monaco, monospace; }
-        a { color: #4271ae; text-decoration: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #1a1a2e; line-height: 1.6; }
+        a { color: #0066ff; text-decoration: none; }
         a:hover { text-decoration: underline; }
+        .container { max-width: 960px; margin: 0 auto; padding: 0 1.5rem; }
+        header { border-bottom: 1px solid #e8e8e8; padding: 1rem 0; }
+        .header-inner { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+        .header-inner img { height: 48px; width: 48px; border-radius: 8px; }
+        .header-inner h1 { font-size: 1.4rem; font-weight: 700; flex: 1; }
+        .header-links { display: flex; gap: 0.5rem; }
+        .header-links a { border: 1px solid #0066ff; padding: 0.3rem 0.9rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600; transition: background 0.2s; }
+        .header-links a:hover { background: #0066ff; color: #fff; text-decoration: none; }
+        .hero { padding: 3rem 0 2rem; }
+        .hero p { font-size: 1.15rem; color: #444; max-width: 700px; }
+        section { padding: 2rem 0; }
+        section h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 1rem; border-bottom: 2px solid #f0f0f0; padding-bottom: 0.5rem; }
+        .install-box { background: #1a1a2e; color: #e0e0e0; padding: 1rem 1.25rem; border-radius: 8px; font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; font-size: 0.9rem; overflow-x: auto; }
+        pre { background: #f6f8fa; border: 1px solid #e1e4e8; border-radius: 8px; padding: 1.25rem; overflow-x: auto; font-size: 0.85rem; line-height: 1.5; }
+        code { font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; }
+        :not(pre) > code { background: #f0f0f0; padding: 2px 6px; border-radius: 4px; font-size: 0.85em; }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+        .feature-card { background: #f9fafb; border: 1px solid #e8e8e8; border-radius: 8px; padding: 1.25rem; }
+        .feature-card h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.4rem; }
+        .feature-card p { font-size: 0.85rem; color: #555; }
+        footer { border-top: 1px solid #e8e8e8; padding: 2rem 0; margin-top: 2rem; text-align: center; color: #888; font-size: 0.85rem; }
+        @media (max-width: 600px) {
+            .header-inner { flex-direction: column; align-items: flex-start; }
+            .hero p { font-size: 1rem; }
+        }
     </style>
 </head>
 <body>
-    <h1>@romatech/orm-providers-mongodb</h1>
-    <p>MongoDB (NoSQL) provider for <a href="https://www.npmjs.com/package/@romatech/orm">@romatech/orm</a>.</p>
-    <p>
-        <a href="https://github.com/RomaTech-LTDA/orm-providers-mongodb">GitHub</a> |
-        <a href="https://www.npmjs.com/package/@romatech/orm-providers-mongodb">npm</a>
-    </p>
-    <h2>Installation</h2>
-    <pre><code>npm install @romatech/orm @romatech/orm-providers-mongodb reflect-metadata</code></pre>
-    <h2>Quick Start</h2>
-    <pre><code>import { MongoDbProvider } from '@romatech/orm-providers-mongodb';
+    <header>
+        <div class="container header-inner">
+            <img src="logo.png" alt="@romatech/orm-providers-mongodb" />
+            <h1>@romatech/orm-providers-mongodb</h1>
+            <nav class="header-links">
+                <a href="https://github.com/RomaTech-LTDA/orm-providers-mongodb">GitHub</a>
+                <a href="https://www.npmjs.com/package/@romatech/orm-providers-mongodb">npm</a>
+            </nav>
+        </div>
+    </header>
 
-new DbContextOptions().useProvider(
-    new MongoDbProvider({
-        uri: 'mongodb://localhost:27017',
-        database: 'myapp',
-    })
-)</code></pre>
+    <main class="container">
+        <div class="hero">
+            <p>MongoDB (NoSQL) provider for <a href="https://www.npmjs.com/package/@romatech/orm">@romatech/orm</a>. Same familiar ORM API — entities map to documents, tables map to collections. Supports transactions with replica sets.</p>
+        </div>
+
+        <section>
+            <h2>Installation</h2>
+            <div class="install-box">npm install @romatech/orm @romatech/orm-providers-mongodb reflect-metadata</div>
+        </section>
+
+        <section>
+            <h2>Quick Start</h2>
+            <pre><code>import 'reflect-metadata';
+import { DbContext, DbContextOptions, Entity, PrimaryKey, Column } from '@romatech/orm';
+import { MongoDbProvider } from '@romatech/orm-providers-mongodb';
+
+@Entity('users')
+class User {
+    @PrimaryKey() id!: string;
+    @Column() name!: string;
+    @Column() email!: string;
+}
+
+class AppDbContext extends DbContext {
+    users = this.set(User);
+
+    constructor() {
+        super(
+            new DbContextOptions().useProvider(
+                new MongoDbProvider({
+                    uri: 'mongodb://localhost:27017',
+                    database: 'myapp'
+                })
+            )
+        );
+    }
+}
+
+const db = new AppDbContext();
+db.users.add({ id: 'abc123', name: 'Alice', email: 'alice@example.com' });
+await db.saveChanges();</code></pre>
+        </section>
+
+        <section>
+            <h2>Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>Full CRUD</h3>
+                    <p>add, addRange, update, remove, removeRange, find, getAll — documents stored in collections.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Transactions</h3>
+                    <p>Multi-document transactions with beginTransaction, commit, rollback (requires replica set).</p>
+                </div>
+                <div class="feature-card">
+                    <h3>QueryBuilder</h3>
+                    <p>Ordering via MongoDB sort(), skip/take pagination, and client-side predicate evaluation.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Schema-less</h3>
+                    <p>No DDL migrations needed — MongoDB is schema-free. Migration history still tracked.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Scaffold</h3>
+                    <p>Infer entity types from sample documents and generate TypeScript files.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>MongoDB 4.0+</h3>
+                    <p>Requires Node.js &ge; 18. Uses the <code>mongodb</code> package (installed automatically).</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>MIT License &copy; RomaTech / Leandro Romanelli</p>
+        </div>
+    </footer>
 </body>
 </html>
