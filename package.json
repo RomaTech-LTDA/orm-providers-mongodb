@@ -40,7 +40,7 @@
     "watch": "tsc --watch"
   },
   "dependencies": {
-    "mongodb": "^6.0.0"
+    "mongodb": "^7.4.0"
   },
   "peerDependencies": {
     "@romatech/orm": "^2.0.0"
