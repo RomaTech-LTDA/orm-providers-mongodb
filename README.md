@@ -124,7 +124,7 @@ try {
 - Ordering via MongoDB `sort()` when every ordering was parsed
 - Skip/Take: when filter and ordering run on the server, MongoDB applies `limit(skip + take)` and the page is cut in memory (rows before the page are checked too, so a document MongoDB matches but JavaScript rejects is never counted by `skip`); otherwise paging is done in memory
 - The server filter never drops a document the JavaScript predicate would keep: bare members are sent as truthy/falsy tests, negations keep array fields, and `x.length`, loose `==`/`!=`, comparisons with numeric strings/booleans/`null` and multi-statement function bodies run in memory only
-- Comparisons are typed, as in MongoDB and in the SQL providers: `u.score > 5` does not match a document whose `score` is `'7'` or `null`, although JavaScript would coerce them (`'7' > 5`, `null >= 0`). Keep a field to one type
+- Comparisons are typed, as in MongoDB and in the SQL providers: `u.score > 5` does not match a document whose `score` is the string `'7'`, although JavaScript would coerce it (`'7' > 5`). Keep a field to one type. `null` follows JavaScript: when `null <op> value` is true (`u.score < 10`, `u.score >= 0`), documents whose field is `null` are also returned
 - Ids are always matched with `$eq`; object/array ids (e.g. `{ $ne: null }` from a request body) are rejected
 - Raw SQL is not supported (throws), except the `BEGIN`/`COMMIT`/`ROLLBACK` sent by `DbContext` transactions
 - Transaction support (replica set required)

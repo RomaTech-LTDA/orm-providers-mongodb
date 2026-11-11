@@ -492,9 +492,13 @@ export class MongoDbProvider implements IDbProvider {
         // `$ne: null` would also drop documents missing the field, which JS keeps.
         if (value === null || value === undefined || dotted) return null;
         return orArray({ $ne: value });
-      case '>': case '>=': case '<': case '<=':
+      case '>': case '>=': case '<': case '<=': {
         if (!isOrderedLiteral(value)) return null;
-        return { [field]: { [RELATIONAL[expr.operator]]: value } };
+        const range = { [field]: { [RELATIONAL[expr.operator]]: value } };
+        // JavaScript converts null to 0 (`null < 10`, `null >= 0` are true);
+        // MongoDB's typed comparison never matches null, so add those rows.
+        return nullSatisfies(expr.operator, value) ? { $or: [range, { [field]: { $eq: null } }] } : range;
+      }
       case 'like': {
         const pattern = typeof value === 'string' ? likeToRegExp(value) : undefined;
         return pattern ? { [field]: { $regex: pattern } } : null;
@@ -555,6 +559,17 @@ function isOrderedLiteral(value: unknown): boolean {
   if (typeof value === 'number') return !Number.isNaN(value);
   if (typeof value === 'bigint' || value instanceof Date) return true;
   return typeof value === 'string' && value.trim() !== '' && Number.isNaN(Number(value));
+}
+
+/** Whether `null <operator> value` is true in JavaScript (null compares as 0). */
+function nullSatisfies(operator: keyof typeof RELATIONAL, value: unknown): boolean {
+  const nothing: any = null;
+  switch (operator) {
+    case '>': return nothing > (value as any);
+    case '>=': return nothing >= (value as any);
+    case '<': return nothing < (value as any);
+    default: return nothing <= (value as any);
+  }
 }
 
 /**

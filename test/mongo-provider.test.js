@@ -223,8 +223,8 @@ describe('query translation', () => {
   // collection below evaluates the filter it receives, like a real server.
   describe('the server filter is never narrower than the JavaScript predicate', () => {
     const rows = [
-      { _id: 1, deletedAt: null, active: 1, tags: ['ab'], items: [1], name: 'x', score: 5, address: [{ city: 'A' }] },
-      { _id: 2, active: true, tags: [], items: [], name: 'y', score: 7, address: { city: 'B' } },
+      { _id: 1, deletedAt: null, active: 1, tags: ['ab'], items: [1], name: 'x', score: 5, address: [{ city: 'A' }], rank: null },
+      { _id: 2, active: true, tags: [], items: [], name: 'y', score: 7, address: { city: 'B' }, rank: 3 },
       { _id: 3, deletedAt: new Date(0), active: false, tags: ['a'], items: [1, 2], name: 'z', score: '7', address: { city: 'A' } }
     ];
 
@@ -238,6 +238,11 @@ describe('query translation', () => {
       ['!== on a path through an array', u => u.address.city !== 'A', [1, 2]],
       ['loose equality with a numeric string', u => u.score == '7', [2, 3]],
       ['relational comparison with a numeric string', u => u.score > '6', [2, 3]],
+      // JavaScript: null < 10, null <= 0 and null >= 0 are true (undefined never is).
+      ['< keeps null fields', u => u.rank < 10, [1, 2]],
+      ['>= 0 keeps null fields', u => u.rank >= 0, [1, 2]],
+      ['> with a negative bound keeps null fields', u => u.rank > -1, [1, 2]],
+      ['> with a positive bound does not need null fields', u => u.rank > 0, [2]],
       ['several statements in a function body', function (u) { if (u.score === 7) return u.name === 'q'; return u.name === 'x'; }, [1]],
       ['a translatable conjunct still reaches the server next to one that is not', u => u.name !== 'q' && !u.deletedAt, [1, 2]]
     ];
