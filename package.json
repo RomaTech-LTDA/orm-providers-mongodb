@@ -1,6 +1,6 @@
 {
   "name": "@romatech/orm-providers-mongodb",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "MongoDB provider for RomaTech ORM — NoSQL document database support",
   "author": "RomaTech/Leandro Romanelli",
   "license": "MIT",
@@ -37,7 +37,8 @@
   "scripts": {
     "clean": "rimraf dist",
     "build": "npm run clean && tsc",
-    "watch": "tsc --watch"
+    "watch": "tsc --watch",
+    "test": "node --test"
   },
   "dependencies": {
     "mongodb": "^6.0.0"
